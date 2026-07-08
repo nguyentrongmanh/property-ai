@@ -19,7 +19,6 @@ const propertyId = ref(ALL)
 const status = ref(ALL)
 const priority = ref(ALL)
 const category = ref(ALL)
-const page = ref(1)
 const perPage = 15
 
 const properties = ref([{ label: 'All properties', value: ALL }])
@@ -32,6 +31,15 @@ const workOrders = ref<WorkOrder[]>([])
 const meta = ref<PaginationMeta | null>(null)
 const emptyMessage = ref('')
 const loading = ref(false)
+
+const {
+  page,
+  canPrevPage,
+  canNextPage,
+  resetPage,
+  prevPage,
+  nextPage
+} = usePagination(meta)
 
 async function loadProperties() {
   try {
@@ -75,16 +83,8 @@ async function load() {
 }
 
 function applyFilters() {
-  page.value = 1
+  resetPage()
   load()
-}
-
-function prevPage() {
-  page.value -= 1
-}
-
-function nextPage() {
-  page.value += 1
 }
 
 watch(page, load)
@@ -195,7 +195,7 @@ onMounted(async () => {
       class="flex items-center justify-center gap-3 pt-4"
     >
       <UButton
-        :disabled="page <= 1"
+        :disabled="!canPrevPage"
         variant="soft"
         @click="prevPage"
       >
@@ -203,7 +203,7 @@ onMounted(async () => {
       </UButton>
       <span class="text-sm text-muted">Page {{ meta.current_page }} of {{ meta.last_page }}</span>
       <UButton
-        :disabled="page >= meta.last_page"
+        :disabled="!canNextPage"
         variant="soft"
         @click="nextPage"
       >
