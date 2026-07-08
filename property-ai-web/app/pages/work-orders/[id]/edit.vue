@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { WorkOrderCategory, WorkOrderPriority, WorkOrderStatus } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import {
+  WORK_ORDER_CATEGORY_OPTIONS,
+  WORK_ORDER_PRIORITY_OPTIONS,
+  WORK_ORDER_STATUS_OPTIONS
+} from '~/utils/work-order-options'
 
 const route = useRoute()
 const workOrdersService = useWorkOrdersService()
@@ -17,28 +22,9 @@ const loading = ref(false)
 const loadFailed = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
 
-const categoryOptions = [
-  { label: 'Elevator', value: 'elevator' },
-  { label: 'Plumbing', value: 'plumbing' },
-  { label: 'Electrical', value: 'electrical' },
-  { label: 'HVAC', value: 'hvac' },
-  { label: 'Cleaning', value: 'cleaning' },
-  { label: 'Security', value: 'security' },
-  { label: 'Structural', value: 'structural' },
-  { label: 'General', value: 'general' }
-]
-const priorityOptions = [
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' },
-  { label: 'Urgent', value: 'urgent' }
-]
-const statusOptions = [
-  { label: 'Open', value: 'open' },
-  { label: 'In progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' }
-]
+const categoryOptions = WORK_ORDER_CATEGORY_OPTIONS
+const priorityOptions = WORK_ORDER_PRIORITY_OPTIONS
+const statusOptions = WORK_ORDER_STATUS_OPTIONS
 
 onMounted(async () => {
   try {

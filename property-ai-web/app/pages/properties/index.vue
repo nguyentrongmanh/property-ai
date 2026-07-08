@@ -3,11 +3,16 @@ import type { PaginationMeta, Property } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
 import { PROPERTY_STATUS_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
+import {
+  PROPERTY_FILTER_ALL,
+  PROPERTY_FILTER_STATUS_OPTIONS,
+  PROPERTY_FILTER_TYPE_OPTIONS
+} from '~/utils/property-options'
 
 const propertiesService = usePropertiesService()
 const alertStore = useAlertStore()
 
-const ALL = 'all'
+const ALL = PROPERTY_FILTER_ALL
 
 const city = ref('')
 const type = ref(ALL)
@@ -16,20 +21,8 @@ const minOccupancy = ref<number | undefined>(undefined)
 const page = ref(1)
 const perPage = 12
 
-const typeOptions = [
-  { label: 'Any type', value: ALL },
-  { label: 'Office', value: 'office' },
-  { label: 'Residential', value: 'residential' },
-  { label: 'Retail', value: 'retail' },
-  { label: 'Industrial', value: 'industrial' },
-  { label: 'Mixed use', value: 'mixed_use' }
-]
-const statusOptions = [
-  { label: 'Any status', value: ALL },
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-  { label: 'Under renovation', value: 'under_renovation' }
-]
+const typeOptions = PROPERTY_FILTER_TYPE_OPTIONS
+const statusOptions = PROPERTY_FILTER_STATUS_OPTIONS
 
 const properties = ref<Property[]>([])
 const meta = ref<PaginationMeta | null>(null)

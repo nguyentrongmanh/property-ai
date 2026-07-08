@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import type { BuildingStatus, BuildingType } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import {
+  PROPERTY_FORM_TYPE_OPTIONS,
+  PROPERTY_STATUS_OPTIONS,
+  PROPERTY_TYPE_UNSPECIFIED
+} from '~/utils/property-options'
 
 const propertiesService = usePropertiesService()
 const alertStore = useAlertStore()
 
-const UNSPECIFIED = 'unspecified'
+const UNSPECIFIED = PROPERTY_TYPE_UNSPECIFIED
 
 const name = ref('')
 const type = ref<BuildingType | typeof UNSPECIFIED>(UNSPECIFIED)
@@ -18,19 +23,8 @@ const amenities = ref('')
 const loading = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
 
-const typeOptions = [
-  { label: 'Not specified', value: UNSPECIFIED },
-  { label: 'Office', value: 'office' },
-  { label: 'Residential', value: 'residential' },
-  { label: 'Retail', value: 'retail' },
-  { label: 'Industrial', value: 'industrial' },
-  { label: 'Mixed use', value: 'mixed_use' }
-]
-const statusOptions = [
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-  { label: 'Under renovation', value: 'under_renovation' }
-]
+const typeOptions = PROPERTY_FORM_TYPE_OPTIONS
+const statusOptions = PROPERTY_STATUS_OPTIONS
 
 async function handleSubmit() {
   loading.value = true

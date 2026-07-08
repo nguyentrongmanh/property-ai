@@ -3,6 +3,11 @@ import type { PaginationMeta, WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
 import { WORK_ORDER_PRIORITY_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
+import {
+  WORK_ORDER_FILTER_CATEGORY_OPTIONS,
+  WORK_ORDER_FILTER_PRIORITY_OPTIONS,
+  WORK_ORDER_FILTER_STATUS_OPTIONS
+} from '~/utils/work-order-options'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
@@ -19,31 +24,9 @@ const perPage = 15
 
 const properties = ref([{ label: 'All properties', value: ALL }])
 
-const statusOptions = [
-  { label: 'Any status', value: ALL },
-  { label: 'Open', value: 'open' },
-  { label: 'In progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' }
-]
-const priorityOptions = [
-  { label: 'Any priority', value: ALL },
-  { label: 'Urgent', value: 'urgent' },
-  { label: 'High', value: 'high' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Low', value: 'low' }
-]
-const categoryOptions = [
-  { label: 'Any category', value: ALL },
-  { label: 'Elevator', value: 'elevator' },
-  { label: 'Plumbing', value: 'plumbing' },
-  { label: 'Electrical', value: 'electrical' },
-  { label: 'HVAC', value: 'hvac' },
-  { label: 'Cleaning', value: 'cleaning' },
-  { label: 'Security', value: 'security' },
-  { label: 'Structural', value: 'structural' },
-  { label: 'General', value: 'general' }
-]
+const statusOptions = WORK_ORDER_FILTER_STATUS_OPTIONS
+const priorityOptions = WORK_ORDER_FILTER_PRIORITY_OPTIONS
+const categoryOptions = WORK_ORDER_FILTER_CATEGORY_OPTIONS
 
 const workOrders = ref<WorkOrder[]>([])
 const meta = ref<PaginationMeta | null>(null)

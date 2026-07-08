@@ -4,6 +4,10 @@ import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alerts'
 import { WORK_ORDER_PRIORITY_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
+import {
+  WORK_ORDER_CATEGORY_OPTIONS,
+  WORK_ORDER_PRIORITY_OPTIONS
+} from '~/utils/work-order-options'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
@@ -29,22 +33,8 @@ const category = ref<WorkOrderCategory>('general')
 const priority = ref<WorkOrderPriority>('medium')
 const summary = ref('')
 
-const categoryOptions = [
-  { label: 'Elevator', value: 'elevator' },
-  { label: 'Plumbing', value: 'plumbing' },
-  { label: 'Electrical', value: 'electrical' },
-  { label: 'HVAC', value: 'hvac' },
-  { label: 'Cleaning', value: 'cleaning' },
-  { label: 'Security', value: 'security' },
-  { label: 'Structural', value: 'structural' },
-  { label: 'General', value: 'general' }
-]
-const priorityOptions = [
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' },
-  { label: 'Urgent', value: 'urgent' }
-]
+const categoryOptions = WORK_ORDER_CATEGORY_OPTIONS
+const priorityOptions = WORK_ORDER_PRIORITY_OPTIONS
 
 const loading = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
