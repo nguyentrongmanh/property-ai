@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaginationMeta, WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { WORK_ORDER_PRIORITY_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
@@ -108,13 +109,6 @@ onMounted(async () => {
   await loadProperties()
   await load()
 })
-
-const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = {
-  urgent: 'error',
-  high: 'warning',
-  medium: 'info',
-  low: 'neutral'
-}
 </script>
 
 <template>
@@ -199,7 +193,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <UBadge
-                :color="priorityColor[wo.priority] ?? 'neutral'"
+                :color="WORK_ORDER_PRIORITY_COLOR[wo.priority] ?? 'neutral'"
                 variant="subtle"
               >
                 {{ wo.priority }}

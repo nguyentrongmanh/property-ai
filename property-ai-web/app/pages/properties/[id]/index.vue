@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Property, WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { PROPERTY_STATUS_COLOR, WORK_ORDER_PRIORITY_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
 
 const route = useRoute()
@@ -41,13 +42,6 @@ async function generateSummary() {
 }
 
 onMounted(load)
-
-const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = {
-  urgent: 'error',
-  high: 'warning',
-  medium: 'info',
-  low: 'neutral'
-}
 </script>
 
 <template>
@@ -83,7 +77,10 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
               {{ property.city ?? 'Unknown city' }} &middot; {{ property.type ?? 'Unknown type' }}
             </p>
           </div>
-          <UBadge variant="subtle">
+          <UBadge
+            :color="PROPERTY_STATUS_COLOR[property.status] ?? 'neutral'"
+            variant="subtle"
+          >
             {{ formatEnumLabel(property.status) }}
           </UBadge>
         </div>
@@ -187,7 +184,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <UBadge
-                  :color="priorityColor[wo.priority] ?? 'neutral'"
+                  :color="WORK_ORDER_PRIORITY_COLOR[wo.priority] ?? 'neutral'"
                   variant="subtle"
                 >
                   {{ wo.priority }}

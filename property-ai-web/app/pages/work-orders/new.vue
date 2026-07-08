@@ -2,6 +2,7 @@
 import type { WorkOrder, WorkOrderCategory, WorkOrderPriority } from '~/types/api'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alerts'
+import { WORK_ORDER_PRIORITY_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
@@ -96,12 +97,6 @@ async function handleSubmit() {
   }
 }
 
-const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = {
-  urgent: 'error',
-  high: 'warning',
-  medium: 'info',
-  low: 'neutral'
-}
 </script>
 
 <template>
@@ -241,7 +236,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
         </p>
         <div class="flex items-center gap-2">
           <UBadge
-            :color="priorityColor[created.priority] ?? 'neutral'"
+            :color="WORK_ORDER_PRIORITY_COLOR[created.priority] ?? 'neutral'"
             variant="subtle"
           >
             {{ created.priority }}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { WORK_ORDER_PRIORITY_COLOR, WORK_ORDER_STATUS_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
 
 const route = useRoute()
@@ -18,19 +19,6 @@ onMounted(async () => {
     alertStore.error(apiErrorMessage(e, 'Could not load this work order.'))
   }
 })
-
-const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = {
-  urgent: 'error',
-  high: 'warning',
-  medium: 'info',
-  low: 'neutral'
-}
-const statusColor: Record<string, 'success' | 'neutral' | 'info' | 'error'> = {
-  open: 'info',
-  in_progress: 'neutral',
-  completed: 'success',
-  cancelled: 'error'
-}
 </script>
 
 <template>
@@ -73,13 +61,13 @@ const statusColor: Record<string, 'success' | 'neutral' | 'info' | 'error'> = {
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <UBadge
-            :color="priorityColor[workOrder.priority] ?? 'neutral'"
+            :color="WORK_ORDER_PRIORITY_COLOR[workOrder.priority] ?? 'neutral'"
             variant="subtle"
           >
             {{ workOrder.priority }}
           </UBadge>
           <UBadge
-            :color="statusColor[workOrder.status] ?? 'neutral'"
+            :color="WORK_ORDER_STATUS_COLOR[workOrder.status] ?? 'neutral'"
             variant="outline"
           >
             {{ formatEnumLabel(workOrder.status) }}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaginationMeta, Property } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { PROPERTY_STATUS_COLOR } from '~/utils/badge-color'
 import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
@@ -82,11 +83,6 @@ function occupancyLabel(rate: number | null) {
   return rate === null ? 'Unknown' : `${Math.round(rate * 100)}%`
 }
 
-const statusColor: Record<string, 'success' | 'neutral' | 'warning'> = {
-  active: 'success',
-  inactive: 'neutral',
-  under_renovation: 'warning'
-}
 </script>
 
 <template>
@@ -176,7 +172,7 @@ const statusColor: Record<string, 'success' | 'neutral' | 'warning'> = {
               </p>
             </div>
             <UBadge
-              :color="statusColor[property.status] ?? 'neutral'"
+              :color="PROPERTY_STATUS_COLOR[property.status] ?? 'neutral'"
               variant="subtle"
             >
               {{ formatEnumLabel(property.status) }}
