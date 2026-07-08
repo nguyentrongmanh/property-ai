@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { applyDefined } from '../common/database/apply-defined';
 import { nextPrefixedId } from '../common/database/prefixed-id';
 import { PaginatedResult } from '../common/pagination/paginated-result';
 import { IndexWorkOrdersDto } from './dto/index-work-orders.dto';
@@ -10,6 +11,7 @@ import {
   WORK_ORDER_PRIORITY_WEIGHT,
   WorkOrderPriority,
 } from './enums/work-order-priority.enum';
+import { WorkOrderStatus } from './enums/work-order-status.enum';
 
 export interface CreateWorkOrderAttributes {
   propertyId: string;
@@ -19,6 +21,14 @@ export interface CreateWorkOrderAttributes {
   category: WorkOrderCategory;
   priority: WorkOrderPriority;
   summary: string;
+}
+
+export interface UpdateWorkOrderAttributes {
+  title?: string;
+  category?: WorkOrderCategory;
+  priority?: WorkOrderPriority;
+  summary?: string;
+  status?: WorkOrderStatus;
 }
 
 const ID_PREFIX = 'WO-';
@@ -83,6 +93,15 @@ export class WorkOrdersRepository {
     const workOrder = this.workOrders.create({ ...attributes, id });
 
     return this.workOrders.save(workOrder);
+  }
+
+  async update(
+    id: string,
+    attributes: UpdateWorkOrderAttributes,
+  ): Promise<WorkOrder> {
+    const workOrder = await this.detail(id);
+
+    return this.workOrders.save(applyDefined(workOrder, attributes));
   }
 
   /**

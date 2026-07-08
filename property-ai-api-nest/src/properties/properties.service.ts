@@ -3,6 +3,7 @@ import { AiService } from '../ai/ai.service';
 import { Building } from './entities/building.entity';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { IndexPropertiesDto } from './dto/index-properties.dto';
+import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CityStats, PropertiesRepository } from './properties.repository';
 import {
   PaginatedResult,
@@ -29,6 +30,18 @@ export class PropertiesService {
 
   create(dto: CreatePropertyDto): Promise<Building> {
     return this.properties.create({
+      name: dto.name,
+      type: dto.type,
+      status: dto.status,
+      city: dto.city,
+      units: dto.units,
+      occupancyRate: dto.occupancy_rate,
+      amenities: dto.amenities,
+    });
+  }
+
+  update(id: string, dto: UpdatePropertyDto): Promise<Building> {
+    return this.properties.update(id, {
       name: dto.name,
       type: dto.type,
       status: dto.status,

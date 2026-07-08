@@ -187,27 +187,31 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
         <li
           v-for="wo in workOrders"
           :key="wo.id"
-          class="py-3 flex items-start justify-between gap-4"
         >
-          <div>
-            <p class="font-medium text-sm">
-              {{ wo.title }}
-            </p>
-            <p class="text-xs text-muted">
-              {{ wo.property_id }} &middot; {{ wo.category }} &middot; {{ wo.created_at }}
-            </p>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <UBadge
-              :color="priorityColor[wo.priority] ?? 'neutral'"
-              variant="subtle"
-            >
-              {{ wo.priority }}
-            </UBadge>
-            <UBadge variant="outline">
-              {{ wo.status }}
-            </UBadge>
-          </div>
+          <NuxtLink
+            :to="`/work-orders/${wo.id}`"
+            class="py-3 flex items-start justify-between gap-4 hover:bg-elevated -mx-2 px-2 rounded"
+          >
+            <div>
+              <p class="font-medium text-sm">
+                {{ wo.title }}
+              </p>
+              <p class="text-xs text-muted">
+                {{ wo.property_id }} &middot; {{ wo.category }} &middot; {{ wo.created_at }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <UBadge
+                :color="priorityColor[wo.priority] ?? 'neutral'"
+                variant="subtle"
+              >
+                {{ wo.priority }}
+              </UBadge>
+              <UBadge variant="outline">
+                {{ wo.status }}
+              </UBadge>
+            </div>
+          </NuxtLink>
         </li>
       </ul>
     </UCard>

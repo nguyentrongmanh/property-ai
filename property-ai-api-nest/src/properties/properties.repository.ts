@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { applyDefined } from '../common/database/apply-defined';
 import { nextPrefixedId } from '../common/database/prefixed-id';
 import { PaginatedResult } from '../common/pagination/paginated-result';
 import { WorkOrder } from '../work-orders/entities/work-order.entity';
@@ -79,6 +80,19 @@ export class PropertiesRepository {
     const building = this.buildings.create({ ...attributes, id });
 
     return this.buildings.save(building);
+  }
+
+  async update(
+    id: string,
+    attributes: Partial<CreateBuildingAttributes>,
+  ): Promise<Building> {
+    const building = await this.buildings.findOneBy({ id });
+
+    if (!building) {
+      throw new NotFoundException(`Building ${id} was not found.`);
+    }
+
+    return this.buildings.save(applyDefined(building, attributes));
   }
 
   async exists(id: string): Promise<boolean> {

@@ -26,7 +26,18 @@
       "Bash(node drive4.mjs)",
       "Bash(find /Users/manh/Documents/learn-project/aspire/node_modules/.pnpm/@nuxt+ui@4.9.0_4ac5395f1df2c43614f7001d83c8f21a/node_modules/@nuxt/ui -iname *Tabs*)",
       "Bash(node drive5.mjs)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(sed -i.bak -E 's/^\\([[:space:]]+[a-zA-Z]+\\)!:/\\\\1:/' src/auth/entities/user.entity.ts src/properties/entities/building.entity.ts src/work-orders/entities/work-order.entity.ts)",
+      "Bash(rm -f src/auth/entities/user.entity.ts.bak src/properties/entities/building.entity.ts.bak src/work-orders/entities/work-order.entity.ts.bak)",
+      "Bash(pnpm test *)",
+      "Bash(curl -s -o /dev/null -w \"Nuxt: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"Nest: %{http_code}\\\\n\" http://localhost:3001/api/properties)",
+      "Bash(node drive6.mjs)",
+      "Bash(echo \"nuxt pid $!\")",
+      "Bash(node debug.mjs)",
+      "Bash(mv properties/\\\\[id\\\\].vue properties/\\\\[id\\\\]/index.vue)",
+      "Bash(mv work-orders/\\\\[id\\\\].vue work-orders/\\\\[id\\\\]/index.vue)",
+      "Bash(rm -rf .nuxt)"
     ],
     "additionalDirectories": [
       "/tmp"

@@ -180,4 +180,40 @@ describe('Properties (e2e)', () => {
       .send({ name: 'No Auth Building' })
       .expect(401);
   });
+
+  it('updates only the fields given, leaving the rest untouched', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/properties')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Editable Building', city: 'Delft', units: 12 })
+      .expect(201);
+
+    const id = created.body.data.id;
+
+    const res = await request(app.getHttpServer())
+      .patch(`/api/properties/${id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ city: 'Leiden', occupancy_rate: 0.42 })
+      .expect(200);
+
+    expect(res.body.data.name).toBe('Editable Building');
+    expect(res.body.data.city).toBe('Leiden');
+    expect(res.body.data.units).toBe(12);
+    expect(res.body.data.occupancy_rate).toBe(0.42);
+  });
+
+  it('404s when updating a missing property', () => {
+    return request(app.getHttpServer())
+      .patch('/api/properties/P-999')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ city: 'Nowhere' })
+      .expect(404);
+  });
+
+  it('blocks property updates without a token', () => {
+    return request(app.getHttpServer())
+      .patch('/api/properties/P-001')
+      .send({ city: 'Nowhere' })
+      .expect(401);
+  });
 });

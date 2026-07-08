@@ -133,4 +133,80 @@ describe('Work Orders (e2e)', () => {
     expect(res.body.errors.priority).toBeDefined();
     expect(res.body.errors.summary).toBeDefined();
   });
+
+  it('shows a single work order', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/work-orders')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        property_id: 'P-001',
+        email: 'staff@example.com',
+        mode: 'manual',
+        description: 'reported directly by building staff after a walkthrough',
+        title: 'Leaky faucet in unit 4B',
+        category: 'plumbing',
+        priority: 'low',
+        summary: 'Faucet in unit 4B drips constantly.',
+      })
+      .expect(201);
+
+    const res = await request(app.getHttpServer())
+      .get(`/api/work-orders/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    expect(res.body.data.title).toBe('Leaky faucet in unit 4B');
+  });
+
+  it('404s for a missing work order', () => {
+    return request(app.getHttpServer())
+      .get('/api/work-orders/WO-9999')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(404);
+  });
+
+  it('updates only the fields given, leaving the rest untouched', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/work-orders')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        property_id: 'P-001',
+        email: 'staff@example.com',
+        mode: 'manual',
+        description: 'reported directly by building staff after a walkthrough',
+        title: 'Original title',
+        category: 'general',
+        priority: 'low',
+        summary: 'Original summary.',
+      })
+      .expect(201);
+
+    const id = created.body.data.id;
+
+    const res = await request(app.getHttpServer())
+      .patch(`/api/work-orders/${id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ status: 'in_progress', priority: 'urgent' })
+      .expect(200);
+
+    expect(res.body.data.title).toBe('Original title');
+    expect(res.body.data.summary).toBe('Original summary.');
+    expect(res.body.data.status).toBe('in_progress');
+    expect(res.body.data.priority).toBe('urgent');
+  });
+
+  it('404s when updating a missing work order', () => {
+    return request(app.getHttpServer())
+      .patch('/api/work-orders/WO-9999')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ status: 'completed' })
+      .expect(404);
+  });
+
+  it('blocks work order updates without a token', () => {
+    return request(app.getHttpServer())
+      .patch('/api/work-orders/WO-9999')
+      .send({ status: 'completed' })
+      .expect(401);
+  });
 });

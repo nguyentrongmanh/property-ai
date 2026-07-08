@@ -6,6 +6,7 @@ import {
 } from '../common/pagination/paginated-result';
 import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { IndexWorkOrdersDto } from './dto/index-work-orders.dto';
+import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 import { WorkOrder } from './entities/work-order.entity';
 import { WorkOrderCreationMode } from './enums/work-order-creation-mode.enum';
 import { WorkOrdersRepository } from './work-orders.repository';
@@ -22,6 +23,20 @@ export class WorkOrdersService {
     const perPage = filters.per_page ?? DEFAULT_PER_PAGE;
 
     return this.workOrders.filter(filters, page, perPage);
+  }
+
+  detail(id: string): Promise<WorkOrder> {
+    return this.workOrders.detail(id);
+  }
+
+  update(id: string, dto: UpdateWorkOrderDto): Promise<WorkOrder> {
+    return this.workOrders.update(id, {
+      title: dto.title,
+      category: dto.category,
+      priority: dto.priority,
+      summary: dto.summary,
+      status: dto.status,
+    });
   }
 
   /**

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -14,6 +15,7 @@ import { paginatedResponse } from '../common/pagination/paginated-result';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { IndexPropertiesDto } from './dto/index-properties.dto';
 import { serializeBuilding } from './dto/property-response.dto';
+import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PropertiesService } from './properties.service';
 
 const EMPTY_LIST_MESSAGE = 'No properties matched the given filters.';
@@ -50,5 +52,10 @@ export class PropertiesController {
   @Get(':id')
   async show(@Param('id') id: string) {
     return { data: serializeBuilding(await this.properties.detail(id)) };
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdatePropertyDto) {
+    return { data: serializeBuilding(await this.properties.update(id, dto)) };
   }
 }
