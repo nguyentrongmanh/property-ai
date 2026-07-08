@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { CityStats } from '~/types/api'
 
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
 const stats = ref<CityStats[]>([])
 const loading = ref(true)
 const error = ref('')
 
 onMounted(async () => {
   try {
-    const res = await apiFetch<{ data: CityStats[] }>('/properties/stats')
+    const res = await propertiesService.stats()
     stats.value = res.data
   } catch (e) {
     error.value = apiErrorMessage(e, 'Could not load stats.')

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Property } from '~/types/api'
+import type { BuildingStatus, BuildingType } from '~/types/api'
 
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
 
 const UNSPECIFIED = 'unspecified'
 
 const name = ref('')
-const type = ref(UNSPECIFIED)
-const status = ref('active')
+const type = ref<BuildingType | typeof UNSPECIFIED>(UNSPECIFIED)
+const status = ref<BuildingStatus>('active')
 const city = ref('')
 const units = ref<number | undefined>(undefined)
 const occupancyRate = ref<number | undefined>(undefined)
@@ -36,19 +36,16 @@ async function handleSubmit() {
   error.value = ''
   fieldErrors.value = {}
   try {
-    const res = await apiFetch<{ data: Property }>('/properties', {
-      method: 'POST',
-      body: {
-        name: name.value,
-        type: type.value === UNSPECIFIED ? undefined : type.value,
-        status: status.value,
-        city: city.value || undefined,
-        units: units.value ?? undefined,
-        occupancy_rate: occupancyRate.value ?? undefined,
-        amenities: amenities.value
-          ? amenities.value.split(',').map(a => a.trim()).filter(Boolean)
-          : undefined
-      }
+    const res = await propertiesService.create({
+      name: name.value,
+      type: type.value === UNSPECIFIED ? undefined : type.value,
+      status: status.value,
+      city: city.value || undefined,
+      units: units.value ?? undefined,
+      occupancy_rate: occupancyRate.value ?? undefined,
+      amenities: amenities.value
+        ? amenities.value.split(',').map(a => a.trim()).filter(Boolean)
+        : undefined
     })
     await navigateTo(`/properties/${res.data.id}`)
   } catch (e) {

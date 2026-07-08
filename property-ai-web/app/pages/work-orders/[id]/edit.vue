@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { WorkOrder } from '~/types/api'
+import type { WorkOrderCategory, WorkOrderPriority, WorkOrderStatus } from '~/types/api'
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const workOrdersService = useWorkOrdersService()
 const id = route.params.id as string
 
 const title = ref('')
-const category = ref('general')
-const priority = ref('medium')
+const category = ref<WorkOrderCategory>('general')
+const priority = ref<WorkOrderPriority>('medium')
 const summary = ref('')
-const status = ref('open')
+const status = ref<WorkOrderStatus>('open')
 
 const loading = ref(false)
 const loadError = ref('')
@@ -41,7 +41,7 @@ const statusOptions = [
 
 onMounted(async () => {
   try {
-    const res = await apiFetch<{ data: WorkOrder }>(`/work-orders/${id}`)
+    const res = await workOrdersService.get(id)
     const workOrder = res.data
     title.value = workOrder.title
     category.value = workOrder.category
@@ -58,15 +58,12 @@ async function handleSubmit() {
   error.value = ''
   fieldErrors.value = {}
   try {
-    await apiFetch(`/work-orders/${id}`, {
-      method: 'PATCH',
-      body: {
-        title: title.value,
-        category: category.value,
-        priority: priority.value,
-        summary: summary.value,
-        status: status.value
-      }
+    await workOrdersService.update(id, {
+      title: title.value,
+      category: category.value,
+      priority: priority.value,
+      summary: summary.value,
+      status: status.value
     })
     await navigateTo(`/work-orders/${id}`)
   } catch (e) {

@@ -6,6 +6,10 @@ export default defineNuxtConfig({
     '@pinia/nuxt'
   ],
 
+  imports: {
+    dirs: ['services']
+  },
+
   devtools: {
     enabled: true
   },

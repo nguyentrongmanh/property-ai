@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { EmptyList, PaginatedList, PaginationMeta, Property, WorkOrder } from '~/types/api'
+import type { PaginationMeta, WorkOrder } from '~/types/api'
 
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
+const workOrdersService = useWorkOrdersService()
 
 const ALL = 'all'
 
@@ -48,7 +49,7 @@ const error = ref('')
 
 async function loadProperties() {
   try {
-    const res = await apiFetch<PaginatedList<Property> | EmptyList>('/properties', { query: { per_page: 100 } })
+    const res = await propertiesService.list({ per_page: 100 })
     if ('meta' in res) {
       properties.value = [
         { label: 'All properties', value: ALL },
@@ -65,13 +66,14 @@ async function load() {
   error.value = ''
   emptyMessage.value = ''
   try {
-    const query: Record<string, string | number> = { page: page.value, per_page: perPage }
-    if (propertyId.value !== ALL) query.property_id = propertyId.value
-    if (status.value !== ALL) query.status = status.value
-    if (priority.value !== ALL) query.priority = priority.value
-    if (category.value !== ALL) query.category = category.value
-
-    const res = await apiFetch<PaginatedList<WorkOrder> | EmptyList>('/work-orders', { query })
+    const res = await workOrdersService.list({
+      page: page.value,
+      per_page: perPage,
+      property_id: propertyId.value === ALL ? undefined : propertyId.value,
+      status: status.value === ALL ? undefined : status.value,
+      priority: priority.value === ALL ? undefined : priority.value,
+      category: category.value === ALL ? undefined : category.value
+    })
     if ('meta' in res) {
       workOrders.value = res.data
       meta.value = res.meta

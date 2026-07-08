@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { EmptyList, PaginatedList, Property, WorkOrder } from '~/types/api'
+import type { WorkOrder, WorkOrderCategory, WorkOrderPriority } from '~/types/api'
 import { useAuthStore } from '~/stores/auth'
 
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
+const workOrdersService = useWorkOrdersService()
 const auth = useAuthStore()
 
 type Mode = 'ai' | 'manual'
@@ -20,8 +21,8 @@ const email = ref(auth.user?.email ?? '')
 const description = ref('')
 
 const title = ref('')
-const category = ref('general')
-const priority = ref('medium')
+const category = ref<WorkOrderCategory>('general')
+const priority = ref<WorkOrderPriority>('medium')
 const summary = ref('')
 
 const categoryOptions = [
@@ -48,7 +49,7 @@ const created = ref<WorkOrder | null>(null)
 
 async function loadProperties() {
   try {
-    const res = await apiFetch<PaginatedList<Property> | EmptyList>('/properties', { query: { per_page: 100 } })
+    const res = await propertiesService.list({ per_page: 100 })
     if ('meta' in res) {
       properties.value = res.data.map(p => ({ label: `${p.name} (${p.id})`, value: p.id }))
     }
@@ -73,20 +74,15 @@ async function handleSubmit() {
   fieldErrors.value = {}
   created.value = null
   try {
-    const body: Record<string, string> = {
+    const res = await workOrdersService.create({
       property_id: propertyId.value,
       email: email.value,
       description: description.value,
-      mode: mode.value
-    }
-    if (mode.value === 'manual') {
-      body.title = title.value
-      body.category = category.value
-      body.priority = priority.value
-      body.summary = summary.value
-    }
-
-    const res = await apiFetch<{ data: WorkOrder }>('/work-orders', { method: 'POST', body })
+      mode: mode.value,
+      ...(mode.value === 'manual'
+        ? { title: title.value, category: category.value, priority: priority.value, summary: summary.value }
+        : {})
+    })
     created.value = res.data
     description.value = ''
     title.value = ''

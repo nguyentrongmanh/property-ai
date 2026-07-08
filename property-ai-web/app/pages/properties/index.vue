@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { EmptyList, PaginatedList, PaginationMeta, Property } from '~/types/api'
+import type { PaginationMeta, Property } from '~/types/api'
 
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
 
 const ALL = 'all'
 
@@ -38,13 +38,14 @@ async function load() {
   error.value = ''
   emptyMessage.value = ''
   try {
-    const query: Record<string, string | number> = { page: page.value, per_page: perPage }
-    if (city.value) query.city = city.value
-    if (type.value !== ALL) query.type = type.value
-    if (status.value !== ALL) query.status = status.value
-    if (minOccupancy.value !== undefined && minOccupancy.value !== null) query.min_occupancy = minOccupancy.value
-
-    const res = await apiFetch<PaginatedList<Property> | EmptyList>('/properties', { query })
+    const res = await propertiesService.list({
+      page: page.value,
+      per_page: perPage,
+      city: city.value || undefined,
+      type: type.value === ALL ? undefined : type.value,
+      status: status.value === ALL ? undefined : status.value,
+      min_occupancy: minOccupancy.value ?? undefined
+    })
     if ('meta' in res) {
       properties.value = res.data
       meta.value = res.meta

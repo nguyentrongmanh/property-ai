@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { Property } from '~/types/api'
+import type { BuildingStatus, BuildingType } from '~/types/api'
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
 const id = route.params.id as string
 
 const UNSPECIFIED = 'unspecified'
 
 const name = ref('')
-const type = ref(UNSPECIFIED)
-const status = ref('active')
+const type = ref<BuildingType | typeof UNSPECIFIED>(UNSPECIFIED)
+const status = ref<BuildingStatus>('active')
 const city = ref('')
 const units = ref<number | undefined>(undefined)
 const occupancyRate = ref<number | undefined>(undefined)
@@ -36,7 +36,7 @@ const statusOptions = [
 
 onMounted(async () => {
   try {
-    const res = await apiFetch<{ data: Property }>(`/properties/${id}`)
+    const res = await propertiesService.get(id)
     const property = res.data
     name.value = property.name
     type.value = property.type ?? UNSPECIFIED
@@ -55,19 +55,16 @@ async function handleSubmit() {
   error.value = ''
   fieldErrors.value = {}
   try {
-    await apiFetch(`/properties/${id}`, {
-      method: 'PATCH',
-      body: {
-        name: name.value,
-        type: type.value === UNSPECIFIED ? undefined : type.value,
-        status: status.value,
-        city: city.value || undefined,
-        units: units.value ?? undefined,
-        occupancy_rate: occupancyRate.value ?? undefined,
-        amenities: amenities.value
-          ? amenities.value.split(',').map(a => a.trim()).filter(Boolean)
-          : undefined
-      }
+    await propertiesService.update(id, {
+      name: name.value,
+      type: type.value === UNSPECIFIED ? undefined : type.value,
+      status: status.value,
+      city: city.value || undefined,
+      units: units.value ?? undefined,
+      occupancy_rate: occupancyRate.value ?? undefined,
+      amenities: amenities.value
+        ? amenities.value.split(',').map(a => a.trim()).filter(Boolean)
+        : undefined
     })
     await navigateTo(`/properties/${id}`)
   } catch (e) {

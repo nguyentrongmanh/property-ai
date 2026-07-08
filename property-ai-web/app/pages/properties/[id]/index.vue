@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { EmptyList, PaginatedList, Property, WorkOrder } from '~/types/api'
+import type { Property, WorkOrder } from '~/types/api'
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const propertiesService = usePropertiesService()
+const workOrdersService = useWorkOrdersService()
 const id = route.params.id as string
 
 const property = ref<Property | null>(null)
@@ -16,12 +17,10 @@ const summaryError = ref('')
 async function load() {
   error.value = ''
   try {
-    const propertyRes = await apiFetch<{ data: Property }>(`/properties/${id}`)
+    const propertyRes = await propertiesService.get(id)
     property.value = propertyRes.data
 
-    const woRes = await apiFetch<PaginatedList<WorkOrder> | EmptyList>('/work-orders', {
-      query: { property_id: id, per_page: 50 }
-    })
+    const woRes = await workOrdersService.list({ property_id: id, per_page: 50 })
     workOrders.value = 'meta' in woRes ? woRes.data : []
   } catch (e) {
     error.value = apiErrorMessage(e, 'Could not load this property.')
@@ -33,7 +32,7 @@ async function generateSummary() {
   summaryError.value = ''
   summary.value = ''
   try {
-    const res = await apiFetch<{ data: { property_id: string, summary: string } }>(`/properties/${id}/summary`)
+    const res = await propertiesService.summary(id)
     summary.value = res.data.summary
   } catch (e) {
     summaryError.value = apiErrorMessage(e, 'Could not generate a summary right now.')

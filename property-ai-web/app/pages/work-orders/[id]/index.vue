@@ -2,7 +2,7 @@
 import type { WorkOrder } from '~/types/api'
 
 const route = useRoute()
-const { apiFetch } = useApi()
+const workOrdersService = useWorkOrdersService()
 const id = route.params.id as string
 
 const workOrder = ref<WorkOrder | null>(null)
@@ -10,7 +10,7 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    const res = await apiFetch<{ data: WorkOrder }>(`/work-orders/${id}`)
+    const res = await workOrdersService.get(id)
     workOrder.value = res.data
   } catch (e) {
     error.value = apiErrorMessage(e, 'Could not load this work order.')
