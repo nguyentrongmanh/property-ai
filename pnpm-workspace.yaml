@@ -1,0 +1,3 @@
+packages:
+  - "property-ai-api-nest"
+  - "property-ai-web"

@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(sed -i.bak 's/^PORT=3000/PORT=3001/' .env)",
+      "Bash(rm .env.bak)",
+      "Bash(sed -i.bak 's#NUXT_PUBLIC_API_BASE=.*#NUXT_PUBLIC_API_BASE=http://localhost:3001/api#' .env)",
+      "Bash(lsof -ti:3001)",
+      "Bash(echo \"nest pid $!\")",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(curl -s -o /dev/null -w \"Nuxt / -> %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"Nuxt /login -> %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"Nest /api/properties \\(no auth\\) -> %{http_code}\\\\n\" http://localhost:3001/api/properties)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node drive.mjs)",
+      "Bash(rm -rf shots)",
+      "Bash(node drive2.mjs)",
+      "Bash(pnpm exec *)",
+      "Bash(node drive3.mjs)",
+      "Bash(node drive4.mjs)",
+      "Bash(find /Users/manh/Documents/learn-project/aspire/node_modules/.pnpm/@nuxt+ui@4.9.0_4ac5395f1df2c43614f7001d83c8f21a/node_modules/@nuxt/ui -iname *Tabs*)",
+      "Bash(node drive5.mjs)",
+      "Bash(git add *)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}

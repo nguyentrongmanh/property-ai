@@ -1,0 +1,23 @@
+# property-ai-api is its own pre-existing git repository (Laravel reference
+# app) - kept as a sibling here for reference, not part of this repo's history.
+/property-ai-api/
+
+# Dependencies (pnpm workspace root + hoisted store)
+node_modules/
+
+# Env files (every app's .env.example stays tracked)
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code local state (settings.json is shared/tracked; these aren't)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

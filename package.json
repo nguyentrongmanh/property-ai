@@ -1,0 +1,13 @@
+{
+  "name": "property-ai-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter property-ai-api-nest dev",
+    "dev:web": "pnpm --filter property-ai-web dev",
+    "seed": "pnpm --filter property-ai-api-nest seed"
+  }
+}

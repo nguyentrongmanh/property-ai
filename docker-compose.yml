@@ -1,0 +1,70 @@
+name: property-ai
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: property_ai
+      POSTGRES_PASSWORD: property_ai
+      POSTGRES_DB: property_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - property_ai_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U property_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      # Host port 6379 is already taken by an unrelated project on this
+      # machine, so this stack's Redis is published on 6380 instead.
+      - "6380:6379"
+    volumes:
+      - property_ai_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./property-ai-api-nest
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    env_file:
+      - ./property-ai-api-nest/.env
+    environment:
+      DATABASE_URL: postgres://property_ai:property_ai@postgres:5432/property_ai
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./property-ai-api-nest:/app
+      - property_ai_api_node_modules:/app/node_modules
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  property_ai_postgres_data:
+  property_ai_redis_data:
+  property_ai_api_node_modules:

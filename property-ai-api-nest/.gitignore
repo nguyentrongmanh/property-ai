@@ -1,0 +1,26 @@
+# Compiled output
+/dist
+/node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Tests
+/coverage
+/.nyc_output
+
+# OS
+.DS_Store
+
+# Editors
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# Env files
+.env
+.env.*
+!.env.example
