@@ -8,13 +8,24 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const start = process.hrtime.bigint();
+    const correlationId = req.headers[CORRELATION_ID_HEADER];
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'request.started',
+        correlation_id: correlationId,
+        method: req.method,
+        path: req.originalUrl,
+      }),
+    );
 
     res.on('finish', () => {
       const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
 
       this.logger.log(
         JSON.stringify({
-          correlation_id: req.headers[CORRELATION_ID_HEADER],
+          event: 'request.completed',
+          correlation_id: correlationId,
           method: req.method,
           path: req.originalUrl,
           status: res.statusCode,
