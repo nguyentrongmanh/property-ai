@@ -190,7 +190,7 @@ onMounted(load)
                   :color="WORK_ORDER_PRIORITY_COLOR[wo.priority] ?? 'neutral'"
                   variant="subtle"
                 >
-                  {{ wo.priority }}
+                  {{ formatEnumLabel(wo.priority) }}
                 </UBadge>
                 <UBadge variant="outline">
                   {{ formatEnumLabel(wo.status) }}

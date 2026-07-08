@@ -64,7 +64,7 @@ onMounted(async () => {
             :color="WORK_ORDER_PRIORITY_COLOR[workOrder.priority] ?? 'neutral'"
             variant="subtle"
           >
-            {{ workOrder.priority }}
+            {{ formatEnumLabel(workOrder.priority) }}
           </UBadge>
           <UBadge
             :color="WORK_ORDER_STATUS_COLOR[workOrder.status] ?? 'neutral'"

@@ -229,7 +229,7 @@ async function handleSubmit() {
             :color="WORK_ORDER_PRIORITY_COLOR[created.priority] ?? 'neutral'"
             variant="subtle"
           >
-            {{ created.priority }}
+            {{ formatEnumLabel(created.priority) }}
           </UBadge>
           <UBadge variant="outline">
             {{ created.category }}
