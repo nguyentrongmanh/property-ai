@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaginationMeta, Property } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
 const alertStore = useAlertStore()
@@ -178,7 +179,7 @@ const statusColor: Record<string, 'success' | 'neutral' | 'warning'> = {
               :color="statusColor[property.status] ?? 'neutral'"
               variant="subtle"
             >
-              {{ property.status }}
+              {{ formatEnumLabel(property.status) }}
             </UBadge>
           </div>
           <div class="mt-4 flex items-center justify-between text-sm text-muted">

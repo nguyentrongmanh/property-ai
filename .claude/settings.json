@@ -39,7 +39,11 @@
       "Bash(mv work-orders/\\\\[id\\\\].vue work-orders/\\\\[id\\\\]/index.vue)",
       "Bash(rm -rf .nuxt)",
       "Bash(grep -n '$fetch\\\\|apiFetch' /Users/manh/Documents/learn-project/aspire/property-ai-web/app/stores/auth.ts)",
-      "Bash(node drive7.mjs)"
+      "Bash(node drive7.mjs)",
+      "Bash(echo \"pid $!\")",
+      "Bash(curl -s -o /dev/null http://localhost:3001/api/properties -H \"Authorization: Bearer bogus\")",
+      "Bash(curl -s -o /dev/null -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"nope@example.com\",\"password\":\"wrong\"}')",
+      "Bash(curl -s -o /dev/null -H \"x-correlation-id: my-custom-trace-123\" http://localhost:3001/api/properties)"
     ],
     "additionalDirectories": [
       "/tmp"

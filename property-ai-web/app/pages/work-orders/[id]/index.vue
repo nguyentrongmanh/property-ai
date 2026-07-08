@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { formatEnumLabel } from '~/utils/enum-label'
 
 const route = useRoute()
 const workOrdersService = useWorkOrdersService()
@@ -81,7 +82,7 @@ const statusColor: Record<string, 'success' | 'neutral' | 'info' | 'error'> = {
             :color="statusColor[workOrder.status] ?? 'neutral'"
             variant="outline"
           >
-            {{ workOrder.status }}
+            {{ formatEnumLabel(workOrder.status) }}
           </UBadge>
         </div>
       </div>

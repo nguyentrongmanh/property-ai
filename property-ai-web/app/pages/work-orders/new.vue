@@ -2,6 +2,7 @@
 import type { WorkOrder, WorkOrderCategory, WorkOrderPriority } from '~/types/api'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alerts'
+import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
@@ -249,7 +250,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
             {{ created.category }}
           </UBadge>
           <UBadge variant="outline">
-            {{ created.status }}
+            {{ formatEnumLabel(created.status) }}
           </UBadge>
         </div>
       </div>

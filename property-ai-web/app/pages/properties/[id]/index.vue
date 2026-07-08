@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Property, WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { formatEnumLabel } from '~/utils/enum-label'
 
 const route = useRoute()
 const propertiesService = usePropertiesService()
@@ -83,7 +84,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
             </p>
           </div>
           <UBadge variant="subtle">
-            {{ property.status }}
+            {{ formatEnumLabel(property.status) }}
           </UBadge>
         </div>
 
@@ -192,7 +193,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
                   {{ wo.priority }}
                 </UBadge>
                 <UBadge variant="outline">
-                  {{ wo.status }}
+                  {{ formatEnumLabel(wo.status) }}
                 </UBadge>
               </div>
             </NuxtLink>

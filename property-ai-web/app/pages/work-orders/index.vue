@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaginationMeta, WorkOrder } from '~/types/api'
 import { useAlertStore } from '~/stores/alerts'
+import { formatEnumLabel } from '~/utils/enum-label'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
@@ -204,7 +205,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
                 {{ wo.priority }}
               </UBadge>
               <UBadge variant="outline">
-                {{ wo.status }}
+                {{ formatEnumLabel(wo.status) }}
               </UBadge>
             </div>
           </NuxtLink>
