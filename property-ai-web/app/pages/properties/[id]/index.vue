@@ -74,7 +74,10 @@ onMounted(load)
               {{ property.name }}
             </h1>
             <p class="text-sm text-muted">
-              {{ property.city ?? 'Unknown city' }} &middot; {{ property.type ?? 'Unknown type' }}
+              {{ property.city ?? 'Unknown city' }}
+              <template v-if="property.type">
+                &middot; {{ formatEnumLabel(property.type) }}
+              </template>
             </p>
           </div>
           <UBadge
@@ -99,7 +102,7 @@ onMounted(load)
               Occupancy
             </p>
             <p class="font-medium">
-              {{ property.occupancy_rate === null ? 'Unknown' : `${Math.round(property.occupancy_rate * 100)}%` }}
+              {{ property.occupancy_rate === null ? '----' : `${Math.round(property.occupancy_rate * 100)}%` }}
             </p>
           </div>
           <div>

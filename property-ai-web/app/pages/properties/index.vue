@@ -73,7 +73,7 @@ watch(page, load)
 onMounted(load)
 
 function occupancyLabel(rate: number | null) {
-  return rate === null ? 'Unknown' : `${Math.round(rate * 100)}%`
+  return rate === null ? '----' : `${Math.round(rate * 100)}%`
 }
 
 </script>
@@ -172,7 +172,7 @@ function occupancyLabel(rate: number | null) {
             </UBadge>
           </div>
           <div class="mt-4 flex items-center justify-between text-sm text-muted">
-            <span>{{ property.type ?? 'Unknown type' }}</span>
+            <span>{{ formatEnumLabel(property.type) }}</span>
             <span>Occupancy {{ occupancyLabel(property.occupancy_rate) }}</span>
           </div>
         </UCard>
