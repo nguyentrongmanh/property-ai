@@ -8,6 +8,15 @@
   "scripts": {
     "dev:api": "pnpm --filter property-ai-api-nest dev",
     "dev:web": "pnpm --filter property-ai-web dev",
-    "seed": "pnpm --filter property-ai-api-nest seed"
+    "seed": "pnpm --filter property-ai-api-nest seed",
+    "prepare": "husky",
+    "build:api": "pnpm --filter property-ai-api-nest build",
+    "build:web": "pnpm --filter property-ai-web build",
+    "build": "pnpm run build:api && pnpm run build:web",
+    "test": "pnpm --filter property-ai-api-nest test",
+    "test:pre-commit": "pnpm test && pnpm run build"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
