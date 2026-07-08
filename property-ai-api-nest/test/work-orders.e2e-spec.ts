@@ -209,4 +209,44 @@ describe('Work Orders (e2e)', () => {
       .send({ status: 'completed' })
       .expect(401);
   });
+
+  it('deletes a work order', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/work-orders')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        property_id: 'P-001',
+        email: 'staff@example.com',
+        mode: 'manual',
+        description: 'reported directly by building staff after a walkthrough',
+        title: 'Delete me',
+        category: 'general',
+        priority: 'low',
+        summary: 'Temporary work order for delete test.',
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .delete(`/api/work-orders/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
+
+    await request(app.getHttpServer())
+      .get(`/api/work-orders/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(404);
+  });
+
+  it('404s when deleting a missing work order', () => {
+    return request(app.getHttpServer())
+      .delete('/api/work-orders/WO-9999')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(404);
+  });
+
+  it('blocks work order deletes without a token', () => {
+    return request(app.getHttpServer())
+      .delete('/api/work-orders/WO-9999')
+      .expect(401);
+  });
 });

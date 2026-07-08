@@ -4,6 +4,7 @@ import {
   DEFAULT_PER_PAGE,
   PaginatedResult,
 } from '../common/pagination/paginated-result';
+import { PropertySummaryCacheService } from '../properties/property-summary-cache.service';
 import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { IndexWorkOrdersDto } from './dto/index-work-orders.dto';
 import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
@@ -16,6 +17,7 @@ export class WorkOrdersService {
   constructor(
     private readonly workOrders: WorkOrdersRepository,
     private readonly aiService: AiService,
+    private readonly summaryCache: PropertySummaryCacheService,
   ) {}
 
   filter(filters: IndexWorkOrdersDto): Promise<PaginatedResult<WorkOrder>> {
@@ -29,14 +31,17 @@ export class WorkOrdersService {
     return this.workOrders.detail(id);
   }
 
-  update(id: string, dto: UpdateWorkOrderDto): Promise<WorkOrder> {
-    return this.workOrders.update(id, {
+  async update(id: string, dto: UpdateWorkOrderDto): Promise<WorkOrder> {
+    const workOrder = await this.workOrders.update(id, {
       title: dto.title,
       category: dto.category,
       priority: dto.priority,
       summary: dto.summary,
       status: dto.status,
     });
+
+    await this.summaryCache.invalidate(workOrder.propertyId);
+    return workOrder;
   }
 
   /**
@@ -47,7 +52,7 @@ export class WorkOrdersService {
    */
   async create(dto: CreateWorkOrderDto): Promise<WorkOrder> {
     if (dto.mode === WorkOrderCreationMode.Manual) {
-      return this.workOrders.create({
+      const workOrder = await this.workOrders.create({
         propertyId: dto.property_id,
         requesterEmail: dto.email,
         sourceText: dto.description,
@@ -56,11 +61,14 @@ export class WorkOrdersService {
         priority: dto.priority!,
         summary: dto.summary!,
       });
+
+      await this.summaryCache.invalidate(workOrder.propertyId);
+      return workOrder;
     }
 
     const generated = await this.aiService.generateWorkOrder(dto.description);
 
-    return this.workOrders.create({
+    const workOrder = await this.workOrders.create({
       propertyId: dto.property_id,
       requesterEmail: dto.email,
       sourceText: dto.description,
@@ -69,5 +77,13 @@ export class WorkOrdersService {
       priority: generated.priority,
       summary: generated.summary,
     });
+
+    await this.summaryCache.invalidate(workOrder.propertyId);
+    return workOrder;
+  }
+
+  async delete(id: string): Promise<void> {
+    const workOrder = await this.workOrders.delete(id);
+    await this.summaryCache.invalidate(workOrder.propertyId);
   }
 }

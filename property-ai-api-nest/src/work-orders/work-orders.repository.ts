@@ -104,6 +104,12 @@ export class WorkOrdersRepository {
     return this.workOrders.save(applyDefined(workOrder, attributes));
   }
 
+  async delete(id: string): Promise<WorkOrder> {
+    const workOrder = await this.detail(id);
+    await this.workOrders.remove(workOrder);
+    return workOrder;
+  }
+
   /**
    * Ranks work orders by their priority weight (urgent=4...low=1) so the
    * most urgent ones sort first regardless of the database driver -

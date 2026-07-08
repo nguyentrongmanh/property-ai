@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -47,5 +48,11 @@ export class WorkOrdersController {
     return {
       data: serializeWorkOrder(await this.workOrders.update(id, dto)),
     };
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async destroy(@Param('id') id: string) {
+    await this.workOrders.delete(id);
   }
 }

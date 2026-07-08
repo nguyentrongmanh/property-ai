@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import request from 'supertest';
 import { Repository } from 'typeorm';
+import { AiService } from '../src/ai/ai.service';
 import { Building } from '../src/properties/entities/building.entity';
 import { WorkOrder } from '../src/work-orders/entities/work-order.entity';
 import { createTestApp } from './utils/create-test-app';
@@ -10,6 +11,7 @@ import { registerAndLogin } from './utils/auth-helpers';
 describe('Properties (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
+  let aiService: AiService;
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -69,6 +71,7 @@ describe('Properties (e2e)', () => {
       },
     ] as WorkOrder[]);
 
+    aiService = app.get(AiService);
     accessToken = await registerAndLogin(app);
   });
 
@@ -134,6 +137,83 @@ describe('Properties (e2e)', () => {
       .expect(200);
 
     expect(res.body.data.summary).toBe('Fake building summary.');
+  });
+
+  it('caches a summary and invalidates it on work-order create/update/delete', async () => {
+    const spy = jest.spyOn(aiService, 'generateBuildingSummary');
+    const baselineCalls = spy.mock.calls.length;
+
+    const propertyRes = await request(app.getHttpServer())
+      .post('/api/properties')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Cache Test Building', city: 'Utrecht' })
+      .expect(201);
+
+    const propertyId = propertyRes.body.data.id;
+
+    // Previous test runs may leave Redis cache entries for deterministic IDs.
+    // Touching the property through update guarantees a clean cache state.
+    await request(app.getHttpServer())
+      .patch(`/api/properties/${propertyId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ city: 'Utrecht' })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .get(`/api/properties/${propertyId}/summary`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(spy.mock.calls.length).toBe(baselineCalls + 1);
+
+    await request(app.getHttpServer())
+      .get(`/api/properties/${propertyId}/summary`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(spy.mock.calls.length).toBe(baselineCalls + 1);
+
+    const created = await request(app.getHttpServer())
+      .post('/api/work-orders')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        property_id: propertyId,
+        email: 'staff@example.com',
+        mode: 'manual',
+        description: 'reported directly by building staff after a walkthrough',
+        title: 'Cache invalidation create test',
+        category: 'general',
+        priority: 'low',
+        summary: 'Created to validate summary cache invalidation.',
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get(`/api/properties/${propertyId}/summary`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(spy.mock.calls.length).toBe(baselineCalls + 2);
+
+    await request(app.getHttpServer())
+      .patch(`/api/work-orders/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ status: 'in_progress' })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .get(`/api/properties/${propertyId}/summary`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(spy.mock.calls.length).toBe(baselineCalls + 3);
+
+    await request(app.getHttpServer())
+      .delete(`/api/work-orders/${created.body.data.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
+
+    await request(app.getHttpServer())
+      .get(`/api/properties/${propertyId}/summary`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(spy.mock.calls.length).toBe(baselineCalls + 4);
   });
 
   it('creates a property with a generated prefixed id', async () => {

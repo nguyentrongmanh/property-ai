@@ -4,6 +4,7 @@ import { Building } from './entities/building.entity';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { IndexPropertiesDto } from './dto/index-properties.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
+import { PropertySummaryCacheService } from './property-summary-cache.service';
 import { CityStats, PropertiesRepository } from './properties.repository';
 import {
   PaginatedResult,
@@ -15,6 +16,7 @@ export class PropertiesService {
   constructor(
     private readonly properties: PropertiesRepository,
     private readonly aiService: AiService,
+    private readonly summaryCache: PropertySummaryCacheService,
   ) {}
 
   filter(filters: IndexPropertiesDto): Promise<PaginatedResult<Building>> {
@@ -40,8 +42,8 @@ export class PropertiesService {
     });
   }
 
-  update(id: string, dto: UpdatePropertyDto): Promise<Building> {
-    return this.properties.update(id, {
+  async update(id: string, dto: UpdatePropertyDto): Promise<Building> {
+    const building = await this.properties.update(id, {
       name: dto.name,
       type: dto.type,
       status: dto.status,
@@ -50,6 +52,9 @@ export class PropertiesService {
       occupancyRate: dto.occupancy_rate,
       amenities: dto.amenities,
     });
+
+    await this.summaryCache.invalidate(id);
+    return building;
   }
 
   statsByCity(): Promise<CityStats[]> {
@@ -57,11 +62,18 @@ export class PropertiesService {
   }
 
   async summary(id: string): Promise<string> {
-    const building = await this.properties.detailWithOpenWorkOrders(id);
+    const cached = await this.summaryCache.get(id);
+    if (cached !== null) {
+      return cached;
+    }
 
-    return this.aiService.generateBuildingSummary({
+    const building = await this.properties.detailWithOpenWorkOrders(id);
+    const summary = await this.aiService.generateBuildingSummary({
       building,
       openWorkOrders: building.workOrders,
     });
+
+    await this.summaryCache.set(id, summary);
+    return summary;
   }
 }

@@ -15,6 +15,7 @@ export interface AppConfig {
     refreshExpiresIn: string;
   };
   bcryptSaltRounds: number;
+  propertySummaryCacheTtlSeconds: number;
   gemini: {
     apiKey: string;
     model: string;
@@ -40,6 +41,10 @@ export default (): AppConfig => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
   },
   bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS ?? '12', 10),
+  propertySummaryCacheTtlSeconds: parseInt(
+    process.env.PROPERTY_SUMMARY_CACHE_TTL_SECONDS ?? '900',
+    10,
+  ),
   gemini: {
     apiKey: process.env.GEMINI_API_KEY ?? '',
     model: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash',
