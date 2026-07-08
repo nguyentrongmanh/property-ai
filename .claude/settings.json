@@ -38,7 +38,8 @@
       "Bash(mv properties/\\\\[id\\\\].vue properties/\\\\[id\\\\]/index.vue)",
       "Bash(mv work-orders/\\\\[id\\\\].vue work-orders/\\\\[id\\\\]/index.vue)",
       "Bash(rm -rf .nuxt)",
-      "Bash(grep -n '$fetch\\\\|apiFetch' /Users/manh/Documents/learn-project/aspire/property-ai-web/app/stores/auth.ts)"
+      "Bash(grep -n '$fetch\\\\|apiFetch' /Users/manh/Documents/learn-project/aspire/property-ai-web/app/stores/auth.ts)",
+      "Bash(node drive7.mjs)"
     ],
     "additionalDirectories": [
       "/tmp"

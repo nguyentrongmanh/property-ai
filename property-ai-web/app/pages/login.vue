@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useAlertStore } from '~/stores/alerts'
 
 const auth = useAuthStore()
+const alertStore = useAlertStore()
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
-const error = ref('')
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   try {
     await auth.login({ email: email.value, password: password.value })
     await navigateTo('/properties')
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Invalid email or password.')
+    alertStore.error(apiErrorMessage(e, 'Invalid email or password.'))
   } finally {
     loading.value = false
   }
@@ -58,13 +58,6 @@ async function handleSubmit() {
             class="w-full"
           />
         </UFormField>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

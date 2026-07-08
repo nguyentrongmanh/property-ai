@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { WorkOrderCategory, WorkOrderPriority, WorkOrderStatus } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const route = useRoute()
 const workOrdersService = useWorkOrdersService()
+const alertStore = useAlertStore()
 const id = route.params.id as string
 
 const title = ref('')
@@ -12,8 +14,7 @@ const summary = ref('')
 const status = ref<WorkOrderStatus>('open')
 
 const loading = ref(false)
-const loadError = ref('')
-const error = ref('')
+const loadFailed = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
 
 const categoryOptions = [
@@ -49,13 +50,13 @@ onMounted(async () => {
     summary.value = workOrder.summary
     status.value = workOrder.status
   } catch (e) {
-    loadError.value = apiErrorMessage(e, 'Could not load this work order.')
+    loadFailed.value = true
+    alertStore.error(apiErrorMessage(e, 'Could not load this work order.'))
   }
 })
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   fieldErrors.value = {}
   try {
     await workOrdersService.update(id, {
@@ -67,7 +68,7 @@ async function handleSubmit() {
     })
     await navigateTo(`/work-orders/${id}`)
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not save the work order.')
+    alertStore.error(apiErrorMessage(e, 'Could not save the work order.'))
     fieldErrors.value = apiFieldErrors(e)
   } finally {
     loading.value = false
@@ -86,14 +87,7 @@ async function handleSubmit() {
       Back to work order
     </UButton>
 
-    <UAlert
-      v-if="loadError"
-      color="error"
-      variant="soft"
-      :title="loadError"
-    />
-
-    <UCard v-else>
+    <UCard v-if="!loadFailed">
       <template #header>
         <h1 class="text-xl font-semibold">
           Edit work order
@@ -159,13 +153,6 @@ async function handleSubmit() {
             class="w-full"
           />
         </UFormField>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

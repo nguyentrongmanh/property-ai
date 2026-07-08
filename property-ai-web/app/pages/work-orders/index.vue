@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { PaginationMeta, WorkOrder } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
+const alertStore = useAlertStore()
 
 const ALL = 'all'
 
@@ -45,7 +47,6 @@ const workOrders = ref<WorkOrder[]>([])
 const meta = ref<PaginationMeta | null>(null)
 const emptyMessage = ref('')
 const loading = ref(false)
-const error = ref('')
 
 async function loadProperties() {
   try {
@@ -63,7 +64,6 @@ async function loadProperties() {
 
 async function load() {
   loading.value = true
-  error.value = ''
   emptyMessage.value = ''
   try {
     const res = await workOrdersService.list({
@@ -83,7 +83,7 @@ async function load() {
       emptyMessage.value = res.message
     }
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not load work orders.')
+    alertStore.error(apiErrorMessage(e, 'Could not load work orders.'))
   } finally {
     loading.value = false
   }
@@ -172,13 +172,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
     </UCard>
 
     <UAlert
-      v-if="error"
-      color="error"
-      variant="soft"
-      :title="error"
-    />
-    <UAlert
-      v-else-if="emptyMessage"
+      v-if="emptyMessage"
       color="neutral"
       variant="soft"
       :title="emptyMessage"

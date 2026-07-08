@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { WorkOrder, WorkOrderCategory, WorkOrderPriority } from '~/types/api'
 import { useAuthStore } from '~/stores/auth'
+import { useAlertStore } from '~/stores/alerts'
 
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
 const auth = useAuthStore()
+const alertStore = useAlertStore()
 
 type Mode = 'ai' | 'manual'
 
@@ -43,7 +45,6 @@ const priorityOptions = [
 ]
 
 const loading = ref(false)
-const error = ref('')
 const fieldErrors = ref<Record<string, string[]>>({})
 const created = ref<WorkOrder | null>(null)
 
@@ -70,7 +71,6 @@ const canSubmit = computed(() => {
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   fieldErrors.value = {}
   created.value = null
   try {
@@ -88,7 +88,7 @@ async function handleSubmit() {
     title.value = ''
     summary.value = ''
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not create the work order.')
+    alertStore.error(apiErrorMessage(e, 'Could not create the work order.'))
     fieldErrors.value = apiFieldErrors(e)
   } finally {
     loading.value = false
@@ -213,13 +213,6 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
             />
           </UFormField>
         </template>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

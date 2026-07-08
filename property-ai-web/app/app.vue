@@ -28,6 +28,8 @@ async function handleLogout() {
 
 <template>
   <UApp>
+    <AppAlerts />
+
     <header
       v-if="showChrome"
       class="border-b border-default"

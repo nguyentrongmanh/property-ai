@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { BuildingStatus, BuildingType } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const route = useRoute()
 const propertiesService = usePropertiesService()
+const alertStore = useAlertStore()
 const id = route.params.id as string
 
 const UNSPECIFIED = 'unspecified'
@@ -16,8 +18,7 @@ const occupancyRate = ref<number | undefined>(undefined)
 const amenities = ref('')
 
 const loading = ref(false)
-const loadError = ref('')
-const error = ref('')
+const loadFailed = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
 
 const typeOptions = [
@@ -46,13 +47,13 @@ onMounted(async () => {
     occupancyRate.value = property.occupancy_rate ?? undefined
     amenities.value = property.amenities?.join(', ') ?? ''
   } catch (e) {
-    loadError.value = apiErrorMessage(e, 'Could not load this property.')
+    loadFailed.value = true
+    alertStore.error(apiErrorMessage(e, 'Could not load this property.'))
   }
 })
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   fieldErrors.value = {}
   try {
     await propertiesService.update(id, {
@@ -68,7 +69,7 @@ async function handleSubmit() {
     })
     await navigateTo(`/properties/${id}`)
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not save the property.')
+    alertStore.error(apiErrorMessage(e, 'Could not save the property.'))
     fieldErrors.value = apiFieldErrors(e)
   } finally {
     loading.value = false
@@ -87,14 +88,7 @@ async function handleSubmit() {
       Back to property
     </UButton>
 
-    <UAlert
-      v-if="loadError"
-      color="error"
-      variant="soft"
-      :title="loadError"
-    />
-
-    <UCard v-else>
+    <UCard v-if="!loadFailed">
       <template #header>
         <h1 class="text-xl font-semibold">
           Edit property
@@ -187,13 +181,6 @@ async function handleSubmit() {
             class="w-full"
           />
         </UFormField>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

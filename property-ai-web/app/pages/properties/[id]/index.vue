@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import type { Property, WorkOrder } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const route = useRoute()
 const propertiesService = usePropertiesService()
 const workOrdersService = useWorkOrdersService()
+const alertStore = useAlertStore()
 const id = route.params.id as string
 
 const property = ref<Property | null>(null)
 const workOrders = ref<WorkOrder[]>([])
-const error = ref('')
 
 const summary = ref('')
 const summaryLoading = ref(false)
-const summaryError = ref('')
 
 async function load() {
-  error.value = ''
   try {
     const propertyRes = await propertiesService.get(id)
     property.value = propertyRes.data
@@ -23,19 +22,18 @@ async function load() {
     const woRes = await workOrdersService.list({ property_id: id, per_page: 50 })
     workOrders.value = 'meta' in woRes ? woRes.data : []
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not load this property.')
+    alertStore.error(apiErrorMessage(e, 'Could not load this property.'))
   }
 }
 
 async function generateSummary() {
   summaryLoading.value = true
-  summaryError.value = ''
   summary.value = ''
   try {
     const res = await propertiesService.summary(id)
     summary.value = res.data.summary
   } catch (e) {
-    summaryError.value = apiErrorMessage(e, 'Could not generate a summary right now.')
+    alertStore.error(apiErrorMessage(e, 'Could not generate a summary right now.'))
   } finally {
     summaryLoading.value = false
   }
@@ -73,14 +71,7 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
       </UButton>
     </div>
 
-    <UAlert
-      v-if="error"
-      color="error"
-      variant="soft"
-      :title="error"
-    />
-
-    <template v-else-if="property">
+    <template v-if="property">
       <UCard>
         <div class="flex items-start justify-between gap-4">
           <div>
@@ -147,14 +138,8 @@ const priorityColor: Record<string, 'error' | 'warning' | 'info' | 'neutral'> = 
             </UButton>
           </div>
         </template>
-        <UAlert
-          v-if="summaryError"
-          color="error"
-          variant="soft"
-          :title="summaryError"
-        />
         <p
-          v-else-if="summary"
+          v-if="summary"
           class="text-sm"
         >
           {{ summary }}

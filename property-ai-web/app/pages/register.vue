@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useAlertStore } from '~/stores/alerts'
 
 const auth = useAuthStore()
+const alertStore = useAlertStore()
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
-const error = ref('')
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   try {
     await auth.register({ name: name.value, email: email.value, password: password.value })
     await navigateTo('/properties')
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not create your account.')
+    alertStore.error(apiErrorMessage(e, 'Could not create your account.'))
   } finally {
     loading.value = false
   }
@@ -71,13 +71,6 @@ async function handleSubmit() {
             class="w-full"
           />
         </UFormField>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

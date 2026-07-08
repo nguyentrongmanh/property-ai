@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { BuildingStatus, BuildingType } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const propertiesService = usePropertiesService()
+const alertStore = useAlertStore()
 
 const UNSPECIFIED = 'unspecified'
 
@@ -14,7 +16,6 @@ const occupancyRate = ref<number | undefined>(undefined)
 const amenities = ref('')
 
 const loading = ref(false)
-const error = ref('')
 const fieldErrors = ref<Record<string, string[]>>({})
 
 const typeOptions = [
@@ -33,7 +34,6 @@ const statusOptions = [
 
 async function handleSubmit() {
   loading.value = true
-  error.value = ''
   fieldErrors.value = {}
   try {
     const res = await propertiesService.create({
@@ -49,7 +49,7 @@ async function handleSubmit() {
     })
     await navigateTo(`/properties/${res.data.id}`)
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not create the property.')
+    alertStore.error(apiErrorMessage(e, 'Could not create the property.'))
     fieldErrors.value = apiFieldErrors(e)
   } finally {
     loading.value = false
@@ -161,13 +161,6 @@ async function handleSubmit() {
             class="w-full"
           />
         </UFormField>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          variant="soft"
-          :title="error"
-        />
 
         <UButton
           type="submit"

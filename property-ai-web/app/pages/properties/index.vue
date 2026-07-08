@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { PaginationMeta, Property } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const propertiesService = usePropertiesService()
+const alertStore = useAlertStore()
 
 const ALL = 'all'
 
@@ -31,11 +33,9 @@ const properties = ref<Property[]>([])
 const meta = ref<PaginationMeta | null>(null)
 const emptyMessage = ref('')
 const loading = ref(false)
-const error = ref('')
 
 async function load() {
   loading.value = true
-  error.value = ''
   emptyMessage.value = ''
   try {
     const res = await propertiesService.list({
@@ -55,7 +55,7 @@ async function load() {
       emptyMessage.value = res.message
     }
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not load properties.')
+    alertStore.error(apiErrorMessage(e, 'Could not load properties.'))
   } finally {
     loading.value = false
   }
@@ -149,13 +149,7 @@ const statusColor: Record<string, 'success' | 'neutral' | 'warning'> = {
     </UCard>
 
     <UAlert
-      v-if="error"
-      color="error"
-      variant="soft"
-      :title="error"
-    />
-    <UAlert
-      v-else-if="emptyMessage"
+      v-if="emptyMessage"
       color="neutral"
       variant="soft"
       :title="emptyMessage"

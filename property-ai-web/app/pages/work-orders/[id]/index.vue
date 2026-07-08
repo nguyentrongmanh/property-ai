@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import type { WorkOrder } from '~/types/api'
+import { useAlertStore } from '~/stores/alerts'
 
 const route = useRoute()
 const workOrdersService = useWorkOrdersService()
+const alertStore = useAlertStore()
 const id = route.params.id as string
 
 const workOrder = ref<WorkOrder | null>(null)
-const error = ref('')
 
 onMounted(async () => {
   try {
     const res = await workOrdersService.get(id)
     workOrder.value = res.data
   } catch (e) {
-    error.value = apiErrorMessage(e, 'Could not load this work order.')
+    alertStore.error(apiErrorMessage(e, 'Could not load this work order.'))
   }
 })
 
@@ -53,14 +54,7 @@ const statusColor: Record<string, 'success' | 'neutral' | 'info' | 'error'> = {
       </UButton>
     </div>
 
-    <UAlert
-      v-if="error"
-      color="error"
-      variant="soft"
-      :title="error"
-    />
-
-    <UCard v-else-if="workOrder">
+    <UCard v-if="workOrder">
       <div class="flex items-start justify-between gap-4">
         <div>
           <h1 class="text-xl font-semibold">
